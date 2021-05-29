@@ -28,7 +28,6 @@ public class AdminUserController {
     public MappingJacksonValue retrieveAllUsers() {
         List<User> users = service.findAll();
         SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name", "joinDate", "password");
-
         FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfo", filter);
 
         MappingJacksonValue mapping = new MappingJacksonValue(users);
@@ -38,8 +37,10 @@ public class AdminUserController {
     }
 
     // GET /admin/users/1 -> /admin/v1/users/1
-    // String으로 들어오는데 int로 자동 변환
-    @GetMapping("/v1/users/{id}")
+//    @GetMapping("/v1/users/{id}")
+//    @GetMapping(value = "/users/{id}/", params = "version=1") // http://localhost:8088/admin/users/1/?version=1
+//    @GetMapping(value = "/users/{id}", headers = "X-API-VERSION=1") // key=X-API-VERSION, value=1
+    @GetMapping(value = "/users/{id}", produces = "application/vnd.company.appv1+json") // key=Accept, value=application/vnd.company.appv1+json
     public MappingJacksonValue retrieveUserV1(@PathVariable int id) {
         User user = service.findOne(id);
         if (user == null) {
@@ -57,8 +58,10 @@ public class AdminUserController {
     }
 
     // GET /admin/users/1 -> /admin/v2/users/1
-    // String으로 들어오는데 int로 자동 변환
-    @GetMapping("/v2/users/{id}")
+//    @GetMapping("/v2/users/{id}")
+//    @GetMapping(value = "/users/{id}/", params = "version=2") // http://localhost:8088/admin/users/1/?version=2
+//    @GetMapping(value = "/users/{id}", headers = "X-API-VERSION=2") // key=X-API-VERSION, value=2
+    @GetMapping(value = "/users/{id}", produces = "application/vnd.company.appv2+json") // key=Accept, value=application/vnd.company.appv2+json
     public MappingJacksonValue retrieveUserV2(@PathVariable int id) {
         User user = service.findOne(id);
 
@@ -75,7 +78,7 @@ public class AdminUserController {
 
         FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfoV2", filter);
 
-        MappingJacksonValue mapping = new MappingJacksonValue(user);
+        MappingJacksonValue mapping = new MappingJacksonValue(userV2);
         mapping.setFilters(filters);
 
         return mapping;
